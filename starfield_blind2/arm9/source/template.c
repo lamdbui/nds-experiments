@@ -4,15 +4,21 @@
 	- Simulate a horizontal scrolling starfield using a framebuffer (no background tiles or sprites)
 	- Stars are tracked as an array of Star
 	- We will do the logic and drawing during the Vblank period
+	Bonus:
+	- Added ability to scroll from the left of the right of the screen
 
 ***/
 
 #include <nds.h>
 
+// static defines
 #define NUM_OF_STARS	40
 #define MAX_STAR_SPEED	4
 #define SPACE_COLOR		RGB15(0,0,0)	// black
 #define STAR_COLOR		RGB15(31,31,31)	// white
+
+// control flags
+#define SCROLL_RIGHT	0	// '0' - start at left of screen. '1' - start at right of screen
 
 // our Star object
 typedef struct {
@@ -52,11 +58,14 @@ void EraseStar(Star *star) {
 }
 
 void MoveStar(Star *star) {
-	star->x += star->speed;
+	if(SCROLL_RIGHT)
+		star->x += star->speed;
+	else
+		star->x -= star->speed;
 
 	// checks to see if it falls off screen. If it does, we create a new star
 	if(star->x > SCREEN_WIDTH) {
-		star->x = 0;
+		star->x = (SCROLL_RIGHT) ? 0 : SCREEN_WIDTH;
 		star->y = rand() % SCREEN_HEIGHT;
 		star->speed = (rand() % MAX_STAR_SPEED) + 1;
 	}
