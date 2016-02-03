@@ -41,6 +41,7 @@ GAME_SUBTITLE2 := http://devitpro.org
 # options for code generation
 #---------------------------------------------------------------------------------
 ARCH := -marm -mthumb-interwork -march=armv5te -mtune=arm946e-s
+#ARCH	:=	-mthumb -mthumb-interwork
 
 CFLAGS   := -g -Wall -O3\
             $(ARCH) $(INCLUDE) -DARM9
