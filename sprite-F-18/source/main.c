@@ -16,12 +16,23 @@
 
 #include "F-18-2-0.h"
 
+// this is padding to account for the empty space in the actual sprite graphic
+#define SHIP_SPRITE_PAD 4
+
+#define SHIP_START_POS_X 100
+#define SHIP_START_POS_Y 50
+
 #define ROTATION_RATE 2
+#define BANK_RATE 2
+#define THRUST_RATE 2
 
 int main() {
 
 	u16 *mainSpriteMem;
 	int shipAngle = 0;
+	//int shipThrust = 0;
+	int shipPosX = SHIP_START_POS_X;
+	int shipPosY = SHIP_START_POS_Y;
 	int keys;
 
 	// setup our interrupts to draw at the appropriate time
@@ -67,6 +78,30 @@ int main() {
 				shipAngle = 360 - shipAngle;
 			}
 		}
+		if(keys & KEY_LEFT) {
+			shipPosX -= BANK_RATE;
+			if(shipPosX < -(32/*sprite size*//2) - SHIP_SPRITE_PAD) {
+				shipPosX = -(32/*sprite size*//2) - SHIP_SPRITE_PAD;
+			}
+		}
+		if(keys & KEY_RIGHT) {
+			shipPosX += BANK_RATE;
+			if(shipPosX > SCREEN_WIDTH - 32 - (32/*sprite size*//2) + SHIP_SPRITE_PAD) {
+				shipPosX = SCREEN_WIDTH - 32 - (32/*sprite size*//2) + SHIP_SPRITE_PAD;
+			}
+		}
+		if(keys & KEY_UP) {
+			shipPosY -= THRUST_RATE;
+			if(shipPosY < (32/*sprite size*//2)) {
+				shipPosY = (32/*sprite size*//2);
+			}
+		}
+		if(keys & KEY_DOWN) {
+			shipPosY += THRUST_RATE;
+			if(shipPosY > SCREEN_HEIGHT - (32/*sprite size*//2)) {
+				shipPosY = SCREEN_HEIGHT - (32/*sprite size*//2);
+			}
+		}
 
 		// setup our sprite affine matrix
 		oamRotateScale(&oamMain,		// main graphics engine context
@@ -79,7 +114,7 @@ int main() {
 		// configure our sprite OAM data
 		oamSet(&oamMain,				// main graphics engine context
 			0,           				// oam index (0 to 127)  
-			100, 50,   					// x and y pixel location of the sprite
+			shipPosX, shipPosY,   		// x and y pixel location of the sprite
 			0,                    		// priority, lower renders last (on top)
 			0,					  		// this is the palette index if multiple palettes or the alpha value if bmp sprite	
 			SpriteSize_32x32,     
